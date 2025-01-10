@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { LockKeyhole } from "lucide-react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -23,19 +24,26 @@ export function LoginForm() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual login logic
-    if (email === "user@example.com" && password === "password") {
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
+    console.log(result);
+
+    if (result?.error) {
+      return toast({
+        title: "Login Failed",
+        description: "Invalid credentials",
+        variant: "destructive",
+      });
+    } else {
       toast({
         title: "Login Successful",
         description: "Welcome back!",
       });
-      router.push("/dashboard");
-    } else {
-      toast({
-        title: "Login Failed",
-        description: "Invalid email or password",
-        variant: "destructive",
-      });
+      router.push("/");
     }
   };
 
@@ -79,7 +87,7 @@ export function LoginForm() {
             Sign In
           </Button>
           <p className="text-sm text-center text-muted-foreground">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-primary hover:underline">
               Sign up
             </Link>

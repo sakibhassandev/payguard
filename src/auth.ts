@@ -23,14 +23,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         try {
           if (!email || !password) {
-            throw new CustomError("All fields are required");
+            throw new CustomError("All fields are required.");
           }
 
           const user = await prisma.user.findUnique({
             where: { email },
             select: {
               id: true,
-              name: true,
               email: true,
               password: true,
               role: true,
@@ -38,13 +37,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
 
           if (!user) {
-            throw new CustomError("User does not exist with this email");
+            throw new CustomError("User does not exist with this email.");
           }
 
           const isPasswordMatch = await bcrypt.compare(password, user.password);
 
           if (!isPasswordMatch) {
-            throw new CustomError("Invalid credentials");
+            throw new CustomError("Invalid credentials.");
           }
           user.password = "";
           return user;
@@ -52,7 +51,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (error instanceof CustomError) {
             throw new CustomError(error.message);
           } else {
-            throw new CustomError("Something went wrong");
+            throw new CustomError("Something went wrong.");
           }
         }
       },

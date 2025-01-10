@@ -14,6 +14,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus } from "lucide-react";
 import Link from "next/link";
+import axios, { AxiosError } from "axios";
+import { ApiError } from "@/utils/ApiError";
 
 export function SignupForm() {
   const [email, setEmail] = useState("");
@@ -23,14 +25,26 @@ export function SignupForm() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual signup logic
-    // Here, we would typically send the user data to the backend
-    // For now, we'll just simulate a successful signup
-    toast({
-      title: "Signup Successful",
-      description: "Your account has been created successfully",
-    });
-    router.push("/login");
+    try {
+      const response = await axios.post("/api/signup", {
+        email,
+        password,
+      });
+      console.log("res", response);
+      toast({
+        title: "Signup Successful",
+        description: `Your account has been created successfully`,
+      });
+      router.push("/login");
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiError>;
+      toast({
+        title: "Signup Error",
+        description:
+          axiosError.response?.data.message || "Something went wrong",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
