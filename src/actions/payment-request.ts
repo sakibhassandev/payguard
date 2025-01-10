@@ -1,9 +1,8 @@
-"use server";
+import axios from "axios";
 
 export async function createPaymentRequest(data: {
   title: string;
   amount: string;
-  description?: string;
 }) {
   if (
     data.title.length < 2 ||
@@ -13,19 +12,30 @@ export async function createPaymentRequest(data: {
     return { success: false, error: "Invalid form data" };
   }
 
-  try {
-    // Here you would typically save the payment request to your database
-    // and create a PayPal order
+  const mockOrderId = `ORDER-${Math.random().toString(36).substr(2, 9)}`;
 
-    // This is a mock PayPal order creation
-    const mockOrderId = `ORDER-${Math.random().toString(36).substr(2, 9)}`;
-
-    return {
-      success: true,
-      orderId: mockOrderId,
-    };
-  } catch (error) {
-    console.error("Failed to create payment request:", error);
-    return { success: false, error: "Failed to create payment request" };
-  }
+  return {
+    success: true,
+    orderId: mockOrderId,
+  };
 }
+
+export const createOrder = (data: { amount: string; title: string }) => {
+  return {
+    intent: "CAPTURE" as const,
+    purchase_units: [
+      {
+        amount: {
+          currency_code: "USD",
+          value: data.amount,
+        },
+        description: data.title,
+      },
+    ],
+  };
+};
+
+export const afterPaymentApprove = async (userData) => {
+  const response = await axios.post("/api/create-payment", userData);
+  return response.data;
+};

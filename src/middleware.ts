@@ -20,7 +20,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url), { status: 302 });
   }
 
-  if (!loginToken && request.nextUrl.pathname === "/") {
+  if (
+    !loginToken &&
+    (request.nextUrl.pathname === "/" ||
+      request.nextUrl.pathname === "/dashboard" ||
+      request.nextUrl.pathname === "/documents")
+  ) {
     return NextResponse.redirect(new URL("/login", request.url), {
       status: 302,
     });

@@ -18,6 +18,9 @@ export function Navbar() {
           <span className="font-bold text-xl">PayGuard</span>
         </Link>
         <div className="flex items-center space-x-4">
+          <Link href="/documents">
+            <Button variant="ghost">Documents</Button>
+          </Link>
           <Link href="/dashboard">
             <Button variant="ghost">Dashboard</Button>
           </Link>

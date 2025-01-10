@@ -37,7 +37,7 @@ model User {
 model Payment {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId
     title     String
-    amount    Float
+    amount    String
     status    Status   @default(pending)
     userId    String   @map("_userId") @db.ObjectId
     user      User     @relation(fields: [userId], references: [id])

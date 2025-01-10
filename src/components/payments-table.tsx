@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -20,38 +20,15 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { PaymentDialog } from "@/components/payment-dialog";
+import { PaymentType } from "@/lib/definitions";
 
-const payments = [
-  {
-    id: 1,
-    title: "Office Supplies",
-    amount: 299.99,
-    status: "pending",
-    date: "2024-01-10",
-  },
-  {
-    id: 2,
-    title: "Software License",
-    amount: 599.99,
-    status: "approved",
-    date: "2024-01-09",
-  },
-  {
-    id: 3,
-    title: "Conference Tickets",
-    amount: 799.99,
-    status: "rejected",
-    date: "2024-01-08",
-  },
-];
-
-export function PaymentsTable() {
+export function PaymentsTable({ payments }: { payments: PaymentType[] }) {
   const [selectedPayment, setSelectedPayment] = useState<
     (typeof payments)[0] | null
   >(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const filteredPayments = payments.filter((payment) =>
+  const filteredPayments = payments?.filter((payment) =>
     statusFilter === "all" ? true : payment.status === statusFilter
   );
 
@@ -72,10 +49,6 @@ export function PaymentsTable() {
             <SelectItem value="rejected">Rejected</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" size="icon">
-          <Download className="h-4 w-4" />
-          <span className="sr-only">Export Data</span>
-        </Button>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -89,12 +62,12 @@ export function PaymentsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredPayments.map((payment) => (
+            {filteredPayments?.map((payment) => (
               <TableRow key={payment.id}>
                 <TableCell>{payment.title}</TableCell>
                 <TableCell>${payment.amount}</TableCell>
                 <TableCell>
-                  {new Date(payment.date).toLocaleDateString()}
+                  {new Date(payment?.createdAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
                   <Badge
@@ -106,7 +79,7 @@ export function PaymentsTable() {
                           : "secondary"
                     }
                   >
-                    {payment.status}
+                    {payment.status?.toUpperCase()}
                   </Badge>
                 </TableCell>
                 <TableCell>

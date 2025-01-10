@@ -2,22 +2,28 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-// import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { createPaymentRequest } from "@/actions/payment-request";
+import {
+  afterPaymentApprove,
+  createOrder,
+  createPaymentRequest,
+} from "@/actions/payment-request";
+import { useSession } from "next-auth/react";
 
 export function PaymentRequestForm() {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const session = useSession();
+
+  const userId = session.data?.user?.id;
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -36,9 +42,9 @@ export function PaymentRequestForm() {
     if (!validateForm()) return;
 
     try {
-      const result = await createPaymentRequest({ title, amount, description });
+      const result = await createPaymentRequest({ title, amount });
       if (result.success) {
-        setPaypalOrderId(result.orderId);
+        setPaypalOrderId(result.orderId ?? null);
       } else {
         toast({
           variant: "destructive",
@@ -46,7 +52,7 @@ export function PaymentRequestForm() {
           description: result.error || "Failed to create payment request",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Error",
@@ -93,36 +99,32 @@ export function PaymentRequestForm() {
           <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
         )}
       </div>
-      <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Description (Optional)
-        </label>
-        <Textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Additional details about the payment request"
-          className="mt-1 resize-none"
-        />
-      </div>
       <Button type="submit">Create Payment Request</Button>
       {paypalOrderId && (
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-4">Complete Payment</h2>
           <PayPalScriptProvider
-            options={{ "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID! }}
+            options={{
+              clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
+            }}
           >
             <PayPalButtons
-              createOrder={() => Promise.resolve(paypalOrderId)}
-              onApprove={async (data, actions) => {
+              createOrder={(data, actions) => {
+                return actions.order.create(createOrder({ amount, title }));
+              }}
+              onApprove={async (data) => {
                 toast({
                   title: "Payment Successful",
                   description: `Payment completed for order ${data.orderID}`,
                 });
+                afterPaymentApprove({ userId, title, amount });
                 router.push("/dashboard");
+              }}
+              onCancel={(data) => {
+                toast({
+                  title: "Payment Cancelled",
+                  description: `Payment was cancelled for order ${data.orderID}`,
+                });
               }}
               onError={() => {
                 toast({

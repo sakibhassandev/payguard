@@ -11,17 +11,12 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { PaymentType } from "@/lib/definitions";
 
 interface PaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  payment: {
-    id: number;
-    title: string;
-    amount: number;
-    status: "pending" | "approved" | "rejected";
-    date: string;
-  };
+  payment: PaymentType;
 }
 
 export function PaymentDialog({
@@ -50,7 +45,7 @@ export function PaymentDialog({
           <div className="grid grid-cols-4 items-center gap-4">
             <span className="font-medium">Date:</span>
             <span className="col-span-3">
-              {new Date(payment.date).toLocaleDateString()}
+              {new Date(payment?.createdAt).toLocaleDateString()}
             </span>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -65,7 +60,7 @@ export function PaymentDialog({
                       : "secondary"
                 }
               >
-                {payment.status}
+                {payment.status?.toUpperCase()}
               </Badge>
             </span>
           </div>
