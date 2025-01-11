@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PayGuard – Payment Tracking and Verification System
 
-## Getting Started
+#### PayGuard is a secure, role-based payment management system built with Next.js, Tailwind CSS, MongoDB, and Prisma. It allows users to track payment requests, upload verification documents, and process payments using PayPal Sandbox, while admins manage and verify those requests through a responsive dashboard.
 
-First, run the development server:
+[========]
+
+## Features
+
+### Authentication
+
+- Role-based access control (Admin/User).
+- Secure signup and login functionality implemented with Auth.js.
+
+### User Features
+
+- Create payment requests with a title, amount, and status.
+- Upload verification documents (PDF/JPG/PNG) stored in Cloudinary.
+- Track payment requests and their statuses (Pending, Approved, Rejected).
+- Make payments through PayPal Sandbox.
+
+### Admin Features
+
+- View and manage all payment requests.
+- Approve or reject payment requests and update their status.
+- Review uploaded verification documents.
+- Filter payments by status and date.
+
+### Notifications
+
+- Email updates for status changes sent using Resend.
+- This feature is build but havent used
+
+### Tech Stack
+
+- Frontend: Next.js (React), Tailwind CSS
+- Backend: Next.js API Routes
+- Database: MongoDB
+- ORM: Prisma
+- Authentication: Auth.js
+- Payments: PayPal Sandbox
+- File Storage: Cloudinary
+- Email Service: Resend
+- Hosting: Vercel
+
+[========]
+
+### Setup Instructions
+
+#### Clone the Repository
+
+```bash
+git clone <repository-url>
+cd <repository-name>
+```
+
+### Install Dependencies
+
+###### Since some dependencies do not natively support Next.js, use the --force flag to install dependencies:
+
+```bash
+npm install --force
+```
+
+### Set Up Environment Variables
+
+###### Create a .env file in the root directory and add the following variables:
+
+    DATABASE_URL=<Your MongoDB Connection String>
+    AUTH_SECRET=<Your Auth.js Secret Key>
+    RESEND_API_KEY=<Your Resend API Key>
+    NEXT_PUBLIC_PAYPAL_CLIENT_ID=<Your PayPal Sandbox Client ID>
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=<Your Cloudinary Cloud Name>
+    NEXT_PUBLIC_CLOUDINARY_API_KEY=<Your Cloudinary API Key>
+    CLOUDINARY_API_SECRET=<Your Cloudinary API Secret>
+
+### Run Database Migrations & Prisma
+
+    npx pirsma generate
+    npx prisma db push
+    npx prisma migrate dev
+
+### Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[========]
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## API Details
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Authentication
 
-## Learn More
+- POST /api/auth/callback: Handles login via Auth.js.
+- POST /api/auth/session: Handles session retrieval.
 
-To learn more about Next.js, take a look at the following resources:
+### Payment Management
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- POST /api/create-payment: Create a new payment request.
+- POST /api/get-payments: Retrieve payment requests (role-based: user/admin).
+- PUT /api/change-payment-status: Update payment status (admin only).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Document Upload
 
-## Deploy on Vercel
+- Used nextjs server action for easy management: Upload a document for verification.
+- Used nextjs server action for easy management (role-based: user/admin).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### PayPal Integration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- POST /api/paypal/checkout: Initiates a payment through PayPal Sandbox.
+
+### Email Notifications
+
+- POST /api/email: Sends email notifications via Resend.
+
+[========]
+
+## Test User/Admin Credentials
+
+### Admin Login
+
+- Email: `admin@test.com`
+
+- Password: `admin123`
+
+### User Login
+
+- Email: `user@test.com`
+
+- Password: `user123`
+
+[========]
+
+## Live Application URL
+
+##### [PayGuard Hosted on Vercel](https://payguard-dev.vercel.app "PayGuard Hosted on Vercel")
+
+[========]
+
+### Contact Me-
+
+##### sakibhassan.webdev@gmail.com
