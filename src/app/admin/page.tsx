@@ -44,6 +44,8 @@ export default function AdminDashboardPage() {
           });
         }
       } catch (error) {
+        await signOut({ redirect: false });
+        router.push("/login");
         console.error("Error in admin access:", error);
         toast({
           title: "Error",
