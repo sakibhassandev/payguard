@@ -1,11 +1,16 @@
 "use client";
 
-import { DashboardMetrics } from "@/components/dashboard-metrics";
+import { DashboardMetrics } from "@/components/dashboard/dashboard-metrics";
 import { Navbar } from "@/components/navbar";
-import { PaymentsTable } from "@/components/payments-table";
+import { PaymentsTable } from "@/components/dashboard/payments-table";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+
+const navbarLinks = [
+  { name: "Documents", href: "/documents" },
+  { name: "Dashboard", href: "/dashboard" },
+];
 
 export default function UserDashboard() {
   const session = useSession();
@@ -28,7 +33,7 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
+      <Navbar name="PayGuard" links={navbarLinks} />
       <main className="container mx-auto py-6 sm:px-6 lg:px-8 space-y-6">
         <h1 className="text-3xl font-bold tracking-tight">My Payments</h1>
         <DashboardMetrics payments={payments ?? []} />

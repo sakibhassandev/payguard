@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { PaymentDialog } from "@/components/payment-dialog";
+import { PaymentDialog } from "@/components/dashboard/payment-dialog";
 import { PaymentType } from "@/lib/definitions";
 
 export function PaymentsTable({ payments }: { payments: PaymentType[] }) {

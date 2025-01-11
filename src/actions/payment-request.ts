@@ -35,7 +35,11 @@ export const createOrder = (data: { amount: string; title: string }) => {
   };
 };
 
-export const afterPaymentApprove = async (userData) => {
+export const afterPaymentApprove = async (userData: {
+  userId: string | undefined;
+  title: string;
+  amount: string | number;
+}) => {
   const response = await axios.post("/api/create-payment", userData);
   return response.data;
 };

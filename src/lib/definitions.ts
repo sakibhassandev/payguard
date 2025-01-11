@@ -6,3 +6,8 @@ export type PaymentType = {
   amount: number | string;
   createdAt: Date;
 };
+
+export type NavbarProps = {
+  name: string;
+  links: { name: string; href: string }[];
+};
