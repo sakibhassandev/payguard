@@ -12,34 +12,6 @@ export async function POST(request: Request) {
       });
     }
 
-    // check user role
-    const user = await prisma.user.findFirst({
-      where: {
-        id: userId,
-      },
-    });
-
-    // if user is admin, fetch all payment requests
-    if (user?.role === "admin") {
-      const payment = await prisma.payment.findMany({
-        include: {
-          user: true,
-        },
-      });
-
-      return Response.json(
-        new ApiResponse(
-          200,
-          true,
-          payment,
-          "Payment requests fetched successfully"
-        ),
-        {
-          status: 200,
-        }
-      );
-    }
-
     // if user is not admin, fetch only their payment requests
     const payment = await prisma.payment.findMany({
       where: {

@@ -30,8 +30,6 @@ export function LoginForm() {
       redirect: false,
     });
 
-    console.log(result);
-
     if (result?.error) {
       return toast({
         title: "Login Failed",

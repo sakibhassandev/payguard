@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,24 +13,44 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { usersDataType } from "@/lib/definitions";
+import axios from "axios";
 
-// This would typically come from your database
-const documents = [
-  { id: "1", userId: "user1", fileName: "id_card.jpg", status: "pending" },
-  { id: "2", userId: "user2", fileName: "passport.pdf", status: "pending" },
-];
-
-export function DocumentReviewTable() {
+export function DocumentReviewTable({
+  usersData,
+}: {
+  usersData: usersDataType[];
+}) {
+  const documents = usersData.flatMap((user) => user.documents);
   const [reviewingDocuments, setReviewingDocuments] = useState(documents);
   const { toast } = useToast();
 
+  useEffect(() => {
+    setReviewingDocuments(usersData.flatMap((user) => user.documents));
+  }, [usersData]);
+
   const handleApprove = async (documentId: string) => {
-    // This would typically be a server action
+    try {
+      await axios.patch("/api/change-document-status", {
+        documentId,
+        status: "approved",
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error",
+        description: "Failed to update document status. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setReviewingDocuments((prevDocs) =>
       prevDocs.map((doc) =>
         doc.id === documentId ? { ...doc, status: "approved" } : doc
       )
     );
+
     toast({
       title: "Success",
       description: "Document approved successfully",
@@ -38,7 +58,20 @@ export function DocumentReviewTable() {
   };
 
   const handleReject = async (documentId: string) => {
-    // This would typically be a server action
+    try {
+      await axios.patch("/api/change-document-status", {
+        documentId,
+        status: "rejected",
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error",
+        description: "Failed to update document status. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
     setReviewingDocuments((prevDocs) =>
       prevDocs.map((doc) =>
         doc.id === documentId ? { ...doc, status: "rejected" } : doc
@@ -51,10 +84,14 @@ export function DocumentReviewTable() {
   };
 
   const handleView = (documentId: string) => {
-    // In a real application, this would open the document in a new tab or modal
+    // Open the document URL in a new tab
+    const doc = reviewingDocuments.find((doc) => doc.id === documentId);
+    if (doc?.fileUrl) {
+      window.open(doc.fileUrl, "_blank");
+    }
     toast({
       title: "View Document",
-      description: `Viewing document ${documentId}`,
+      description: `Viewing document ${doc?.title}`,
     });
   };
 
@@ -63,7 +100,7 @@ export function DocumentReviewTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>User ID</TableHead>
+            <TableHead>User</TableHead>
             <TableHead>File Name</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
@@ -72,8 +109,8 @@ export function DocumentReviewTable() {
         <TableBody>
           {reviewingDocuments.map((doc) => (
             <TableRow key={doc.id}>
-              <TableCell>{doc.userId}</TableCell>
-              <TableCell>{doc.fileName}</TableCell>
+              <TableCell>{doc.user.email}</TableCell>
+              <TableCell>{doc.title}</TableCell>
               <TableCell>
                 <Badge
                   variant={
@@ -84,7 +121,7 @@ export function DocumentReviewTable() {
                         : "secondary"
                   }
                 >
-                  {doc.status}
+                  {doc.status.toUpperCase()}
                 </Badge>
               </TableCell>
               <TableCell>
@@ -96,22 +133,24 @@ export function DocumentReviewTable() {
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleApprove(doc.id)}
-                    disabled={doc.status !== "pending"}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleReject(doc.id)}
-                    disabled={doc.status !== "pending"}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+                  {doc.status === "pending" && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleApprove(doc.id)}
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleReject(doc.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               </TableCell>
             </TableRow>

@@ -1,27 +1,57 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { usersDataType } from "@/lib/definitions";
 
-export function AdminDashboardSummary() {
+export function AdminDashboardSummary({
+  usersData,
+}: {
+  usersData: usersDataType[];
+}) {
   const [summary, setSummary] = useState({
     totalPayments: 0,
+    totalAmount: 0,
     pendingPayments: 0,
     approvedPayments: 0,
-    rejectedPayments: 0,
-    totalAmount: 0,
   });
 
+  //   Calculate the total payments, total amount, pending payments, and approved payments
   useEffect(() => {
-    // TODO: Fetch real data from API
+    const totalPayments = usersData.reduce((acc, user) => {
+      return acc + user.payments.length;
+    }, 0);
+
+    const totalAmount = usersData.reduce((acc, user) => {
+      return (
+        acc +
+        user.payments.reduce((acc, payment) => {
+          return acc + parseFloat(payment.amount);
+        }, 0)
+      );
+    }, 0);
+
+    const pendingPayments = usersData.reduce((acc, user) => {
+      return (
+        acc +
+        user.payments.filter((payment) => payment.status === "pending").length
+      );
+    }, 0);
+
+    const approvedPayments = usersData.reduce((acc, user) => {
+      return (
+        acc +
+        user.payments.filter((payment) => payment.status === "approved").length
+      );
+    }, 0);
+
     setSummary({
-      totalPayments: 100,
-      pendingPayments: 30,
-      approvedPayments: 60,
-      rejectedPayments: 10,
-      totalAmount: 50000,
+      totalPayments,
+      totalAmount,
+      pendingPayments,
+      approvedPayments,
     });
-  }, []);
+  }, [usersData]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

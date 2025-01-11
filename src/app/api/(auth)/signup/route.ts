@@ -5,7 +5,7 @@ import { ApiResponse } from "@/utils/ApiResponse";
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const { email, password, role } = await request.json();
 
     if (!email || !password) {
       return Response.json(
@@ -32,6 +32,7 @@ export async function POST(request: Request) {
       data: {
         email,
         password: hashedPassword,
+        role: role || "user",
       },
       select: {
         email: true,
