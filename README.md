@@ -129,6 +129,12 @@ npm run dev
 
 - Password: `user123`
 
+### Paypal Sandbox Credential (For Payment)
+
+- Email: `sb-8w0pu35788956@personal.example.com`
+
+- Password: `n3K*yS19`
+
 [========]
 
 ## Live Application URL
